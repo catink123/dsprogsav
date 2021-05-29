@@ -141,7 +141,6 @@ div.itemContainer {
 }
 
 .addWindow {
-  position: absolute;
   margin: 5px;
 }
 

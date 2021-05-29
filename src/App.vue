@@ -20,9 +20,9 @@
         <img src="@/assets/Religion.png" />
       </router-link>
     </div>
-    <transition>
-      <router-view />
-    </transition>
+    <!-- <transition name="fade"> -->
+      <router-view class="marginTop" />
+    <!-- </transition> -->
   </div>
 </template>
 
