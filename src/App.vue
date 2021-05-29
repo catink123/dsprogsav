@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :style="`background-image: url(${images.bg})`">
+  <div id="app" :style="`background-image: linear-gradient(transparent 95%, black), url(${images.bg})`">
     <div id="nav">
       <img src="@/assets/fire.gif" id="fire" />
       <router-link to="/">
@@ -57,6 +57,7 @@ body {
   height: 100vh;
   background-size: cover;
   background-position: center;
+
 }
 
 #nav {
@@ -65,6 +66,9 @@ body {
   flex-direction: row;
   background: rgba(0 0 0 / 0.25);
   backdrop-filter: blur(10px);
+  position: fixed;
+  z-index: 15;
+  width: 100%;
 }
 
 #nav img {

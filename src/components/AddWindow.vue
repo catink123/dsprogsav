@@ -10,7 +10,7 @@
         <label for="desc">Description </label>
       </div>
       <div>
-        <textarea :class="descError ? 'err' : null" id="desc" @input="descError = false" />
+        <textarea id="desc" />
       </div>
 
       <div>
@@ -42,7 +42,6 @@ export default {
   },
   data: () => ({
     nameError: false,
-    descError: false,
     imageError: false,
   }),
   methods: {
@@ -53,10 +52,6 @@ export default {
       let image;
       if (name === "") {
         this.nameError = true;
-        return;
-      }
-      if (description === "") {
-        this.descError = true;
         return;
       }
       if (file !== undefined) {
@@ -173,7 +168,7 @@ form textarea:focus {
   color: black;
 }
 
-form input.err, form textarea.err {
+form input.err {
   border-color: red;
   background-color: rgba(255 0 0 / 0.25);
 }

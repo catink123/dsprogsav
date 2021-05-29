@@ -2,7 +2,7 @@
   <div class="card" :class="done ? 'done' : null" @click="toggleDone">
     <div class="main">
       <img class="image" :src="imageURL" />
-      <p class="name">{{ name }}</p>
+      <p class="name" :class="name.length >= 20 ? 'longName' : null">{{ name }}</p>
     </div>
     <div class="desc">
       <div class="scrollable">
@@ -71,6 +71,11 @@ p.name {
   background: rgba(0 0 0 / 0.5);
   border-radius: 9px;
   line-height: 24px;
+}
+
+p.name.longName {
+  line-height: normal;
+  font-size: 12px;
 }
 
 img.image {

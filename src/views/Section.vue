@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="section">
     <div class="addContainer">
       <button @click="toggleAddWindow">Add</button>
       <transition name="fade">
@@ -127,6 +127,10 @@ export default {
 
 
 <style scoped>
+div.section {
+  padding-top: 115px;
+}
+
 div.itemContainer {
   display: flex;
   gap: 10px;
@@ -141,7 +145,13 @@ div.itemContainer {
   margin: 5px;
 }
 
+.addContainer {
+  position: fixed;
+  z-index: 10;
+}
+
 .addContainer button {
   margin: 5px;
+  margin-bottom: 0;
 }
 </style>
