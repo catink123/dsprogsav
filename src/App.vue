@@ -1,47 +1,50 @@
 <template>
-  <div id="app" :style="`background-image: linear-gradient(transparent 95%, black), url(${images.bg})`">
+  <div id="app" :style="`background-image: linear-gradient(transparent 95%, black), url(${currentBg})`">
     <div id="nav">
       <img src="@/assets/fire.gif" id="fire" />
-      <router-link to="/">
-        <img src="@/assets/dslogo.png" />
-      </router-link>
-      <div class="separator" />
+      <div class="gameList">
+      <a v-for="game in gameList" :key="game" :class="currentGame === game ? 'active' : null" @click="setGameName(game); update()">
+        <img :src="gameData[game].logo" />
+      </a>
+    </div>
+      <!-- <div class="separator" /> -->
       <div class="appControls">
         <button @click="save">Save</button>
         <button @click="load">Load</button>
       </div>
-      <router-link to="/dsRemastered/armory">
-        <img src="@/assets/Armory.png" />
-      </router-link>
-      <router-link to="/dsRemastered/pyromancy">
-        <img src="@/assets/Pyromancy.png" />
-      </router-link>
-      <router-link to="/dsRemastered/religion">
-        <img src="@/assets/Religion.png" />
-      </router-link>
-    </div>
-    <!-- <transition name="fade"> -->
-      <router-view class="marginTop" />
-    <!-- </transition> -->
+        <router-link class="section" v-for="section in gameData[currentGame].sections" :key="section.path" :to="'/' + currentGame + '/' + section.path">
+          <img :src="section.image">
+        </router-link>
+      </div>
+    <router-view class="marginTop" />
   </div>
 </template>
 
 <script>
-import images from "./images";
-import {mapActions} from 'vuex';
-import store from '@/store'
+import games from "./games";
+import {mapActions, mapMutations, mapGetters} from 'vuex';
+import store from '@/store';
 
 export default {
   name: "App",
   computed: {
-    images: () => images,
+    currentBg: () => games[store.state.currentGame].bg,
+    ...mapGetters(["currentGame"]),
+    gameData: () => games,
+    gameList: () => Object.keys(games)
   },
   methods: {
-    ...mapActions(["save", "load"])
+    ...mapActions(["save", "load"]),
+    ...mapMutations(["setGameName"]),
+    update() {
+      this.$router.push('/' + this.currentGame + '/' + this.gameData[this.currentGame].sections[0].path);
+    }
   },
   mounted() {
     store.dispatch("load")
-  }
+    if (window.location.hash.replace("#/", "").split("/")[0] !== this.currentGame) 
+      this.setGameName(window.location.hash.replace("#/", "").split("/")[0]);
+  },
 };
 </script>
 
@@ -68,7 +71,8 @@ body {
   backdrop-filter: blur(10px);
   position: fixed;
   z-index: 15;
-  width: 100%;
+  width: 100vw;
+  overflow-x: visible;
 }
 
 #nav img {
@@ -85,17 +89,19 @@ img#fire {
   font-weight: bold;
   color: white;
   padding: 2px;
-  margin: 5px;
   text-decoration: none;
   height: fit-content;
   max-height: 100px;
+  margin: 5px;
 }
 
 #nav a > img {
   margin: 0;
   border-radius: 3px;
+  pointer-events: none;
 }
-#nav a.router-link-exact-active {
+
+#nav a.section.router-link-exact-active, #nav a.active {
   color: black;
   background: rgba(255 255 255 / 0.25);
   border-radius: 5px;
@@ -138,5 +144,14 @@ button:active {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+
+.gameList {
+  display: flex;
+  gap: 5px;
+  flex-grow: 1;
+  min-width: 0;
+  overflow-x: auto;
+  max-height: 115px;
 }
 </style>

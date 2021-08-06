@@ -39,14 +39,6 @@ export default {
     items: [],
     showAddWindow: false,
   }),
-  getters: {
-    /* items() {
-      return store.state[this.gameName][this.sectionName];
-    } */
-    needsUpdate() {
-      return store.state.needsUpdate;
-    },
-  },
   props: {
     gameName: String,
     sectionName: String,
@@ -56,7 +48,7 @@ export default {
       return this.compressedImage;
     },
 
-    ...mapGetters(["loading"]),
+    ...mapGetters(["loading", "currentGame"]),
   },
   components: {
     Item,
@@ -105,19 +97,23 @@ export default {
     toggleAddWindow() {
       this.showAddWindow = !this.showAddWindow;
     },
+
+    updateContents() {
+      this.items = store.state[this.gameName][this.sectionName]
+    }
   },
   watch: {
     gameName: function () {
-      this.items = store.state[this.gameName][this.sectionName];
+      this.updateContents();
     },
 
     sectionName: function () {
-      this.items = store.state[this.gameName][this.sectionName];
+      this.updateContents();
     },
 
-    loading() {
-      this.items = store.state[this.gameName][this.sectionName];
-    },
+    loading: function() {
+      this.updateContents();
+    }
   },
   created() {
     this.items = store.state[this.gameName][this.sectionName];

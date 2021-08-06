@@ -11,7 +11,22 @@ export default new Vuex.Store({
       pyromancy: [],
       religion: []
     },
-    loading: true
+    ds2sotfs: {
+      corruption: [],
+      gestures: [],
+      pyromancy: [],
+      wizardry: [],
+      wonders: []
+    },
+    ds3: {
+      expression: [],
+      miracles: [],
+      pyromancies: [],
+      rings: [],
+      sorceries: []
+    },
+    loading: true,
+    currentGame: 'dsRemastered'
   },
   mutations: {
     addNewItem(state, payload) {
@@ -41,6 +56,10 @@ export default new Vuex.Store({
 
     setLoading(state, loading) {
       state.loading = loading;
+    },
+
+    setGameName(state, name) {
+      state.currentGame = name;
     }
   },
   actions: {
@@ -73,8 +92,7 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    loading(state) {
-      return state.loading;
-    }
-  }
+    loading: (state) => state.loading,
+    currentGame: (state) => state.currentGame
+  },
 })

@@ -57,6 +57,10 @@ export default {
   background: rgba(0 100 0 / 0.5);
 }
 
+.card.done p.name {
+  background: rgba(0 100 0 / 0.25);
+}
+
 div.main {
   display: flex;
   flex-direction: column;

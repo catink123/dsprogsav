@@ -11,21 +11,6 @@ const routes = [
     name: 'Home',
     component: Home
   },
-  /* {
-    path: '/religion',
-    name: 'Religion',
-    component: () => import('../views/ReligionSection.vue')
-  },
-  {
-    path: '/armory',
-    name: 'Armory',
-    component: () => import('../views/ArmorySection.vue')
-  },
-  {
-    path: '/pyromancy',
-    name: 'Pyromancy',
-    component: () => import('../views/PyromancySection.vue')
-  } */
   {
     path: '/:gameName/:sectionName',
     component: Section,
