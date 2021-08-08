@@ -1,50 +1,63 @@
 <template>
-  <div id="app" :style="`background-image: linear-gradient(transparent 95%, black), url(${currentBg})`">
+  <div
+    id="app"
+    :style="`background-image: linear-gradient(transparent 95%, black), url(${currentBg()})`"
+  >
     <div id="nav">
       <img src="@/assets/fire.gif" id="fire" />
       <div class="gameList">
-      <a v-for="game in gameList" :key="game" :class="currentGame === game ? 'active' : null" @click="setGameName(game); update()">
-        <img :src="gameData[game].logo" />
-      </a>
-    </div>
-      <!-- <div class="separator" /> -->
-      <div class="appControls">
-        <button @click="save">Save</button>
-        <button @click="load">Load</button>
-      </div>
-        <router-link class="section" v-for="section in gameData[currentGame].sections" :key="section.path" :to="'/' + currentGame + '/' + section.path">
-          <img :src="section.image">
+        <router-link
+          v-for="game in gameList"
+          :key="game"
+          :to="game"
+          class="section"
+        >
+          <img :src="gameData[game].logo" />
         </router-link>
       </div>
+    </div>
     <router-view class="marginTop" />
   </div>
 </template>
 
 <script>
 import games from "./games";
-import {mapActions, mapMutations, mapGetters} from 'vuex';
-import store from '@/store';
+import placeholderBG from './assets/placeholderBG.jpg';
 
 export default {
   name: "App",
   computed: {
-    currentBg: () => games[store.state.currentGame].bg,
-    ...mapGetters(["currentGame"]),
     gameData: () => games,
-    gameList: () => Object.keys(games)
+    gameList: () => Object.keys(games),
   },
   methods: {
-    ...mapActions(["save", "load"]),
-    ...mapMutations(["setGameName"]),
     update() {
-      this.$router.push('/' + this.currentGame + '/' + this.gameData[this.currentGame].sections[0].path);
-    }
-  },
-  mounted() {
-    store.dispatch("load")
-    if (window.location.hash.replace("#/", "").split("/")[0] !== this.currentGame) 
-      this.setGameName(window.location.hash.replace("#/", "").split("/")[0]);
-  },
+      this.$router.push(
+        "/" +
+          this.currentGame +
+          "/" +
+          this.gameData[this.currentGame].sections[0].path
+      );
+    },
+
+    save() {
+      console.log("save");
+    },
+
+    load() {
+      console.log("load");
+    },
+
+    currentBg() {
+      var bg;
+      if (this.$router.currentRoute.path !== "/") {
+        bg = games[this.$router.currentRoute.path.replace("/", "")].bg;
+      } else {
+        bg = placeholderBG;
+      }
+      return bg;
+    },
+  }
 };
 </script>
 
@@ -60,7 +73,6 @@ body {
   height: 100vh;
   background-size: cover;
   background-position: center;
-
 }
 
 #nav {
@@ -101,7 +113,8 @@ img#fire {
   pointer-events: none;
 }
 
-#nav a.section.router-link-exact-active, #nav a.active {
+#nav a.section.router-link-exact-active,
+#nav a.active {
   color: black;
   background: rgba(255 255 255 / 0.25);
   border-radius: 5px;
@@ -126,7 +139,7 @@ button {
   outline: none;
   padding: 5px;
   border-radius: 6px;
-  transition-duration: .1s;
+  transition-duration: 0.1s;
   user-select: none;
 }
 
@@ -139,8 +152,9 @@ button:active {
   color: black;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .15s;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;

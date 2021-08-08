@@ -5,6 +5,7 @@
       <transition name="fade">
         <add-window
           class="addWindow"
+          @onAdd="addItem"
           :addCallback="addItem"
           :cancelCallback="toggleAddWindow"
           v-if="showAddWindow"
@@ -16,11 +17,10 @@
         v-for="item in items"
         :key="item.name"
         :name="item.name"
-        :description="item.description"
-        :done="item.done"
-        :imageURL="item.image"
-        :clickCallback="toggleDone"
-        :deleteCallback="deleteItem"
+        :isDone="item.isDone"
+        :items="item.items"
+        @onItemClick="toggleDone"
+        @onDelete="deleteItem(item.name)"
       />
     </div>
   </div>
@@ -29,9 +29,6 @@
 <script>
 import Item from "@/components/Item.vue";
 import AddWindow from "@/components/AddWindow.vue";
-import compress from "@/ext/compress.js";
-import store from "@/store";
-import { mapGetters } from "vuex";
 
 export default {
   name: "Section",
@@ -41,14 +38,11 @@ export default {
   }),
   props: {
     gameName: String,
-    sectionName: String,
   },
   computed: {
     compressed() {
       return this.compressedImage;
     },
-
-    ...mapGetters(["loading", "currentGame"]),
   },
   components: {
     Item,
@@ -56,42 +50,27 @@ export default {
   },
   methods: {
     addItem(data) {
-      let item = store.state[this.gameName][this.sectionName].find((val) => {
-        if (val.name === data.name) return true;
-        return false;
-      });
+      let item = this.items.find(val => val.name === data.name);
       if (item === undefined) {
-        compress(data.image).then((val) => {
-          store.commit("addNewItem", {
-            gameName: this.gameName,
-            sectionName: this.sectionName,
-            data: {
-              ...data,
-              image: val,
-              done: false,
-            },
-          });
-          this.toggleAddWindow();
-        });
+        this.items.push(data);
+        this.save();
+        this.toggleAddWindow();
       } else {
         alert('An item with that name already exists in this section!')
       }
     },
 
-    toggleDone(key) {
-      store.commit("toggleDone", {
-        gameName: this.gameName,
-        sectionName: this.sectionName,
-        key,
-      });
+    toggleDone(data) {
+      var index = this.items.findIndex(val => val.name === data.name);
+      var itemIndex = this.items[index].items.findIndex(val => val.text === data.itemKey);
+      this.items[index].items[itemIndex].isDone = !this.items[index].items[itemIndex].isDone;
+      this.save();
     },
 
     deleteItem(key) {
-      store.commit("deleteItem", {
-        gameName: this.gameName,
-        sectionName: this.sectionName,
-        key,
-      });
+      var index = this.items.findIndex(val => val.name === key);
+      this.items.splice(index, 1);
+      this.save();
     },
 
     toggleAddWindow() {
@@ -99,7 +78,35 @@ export default {
     },
 
     updateContents() {
-      this.items = store.state[this.gameName][this.sectionName]
+      this.items = this.getData();
+      console.log(this.items);
+    },
+
+    getData() {
+      var appData = localStorage.getItem("dsprogsav");
+      var ret;
+      if (appData !== null) {
+        var data = JSON.parse(appData)[this.gameName];
+        if (data !== null)
+          ret = data;
+        else
+          ret = [];
+      } else {
+        ret = [];
+      }
+      return ret;
+    },
+
+    setData(data) {
+      var appData = localStorage.getItem("dsprogsav");
+      if (appData === null) appData = {};
+      else appData = JSON.parse(appData);
+      appData[this.gameName] = data;
+      localStorage.setItem("dsprogsav", JSON.stringify(appData));
+    },
+
+    save() {
+      this.setData(JSON.stringify(this.items));
     }
   },
   watch: {
@@ -107,16 +114,13 @@ export default {
       this.updateContents();
     },
 
-    sectionName: function () {
-      this.updateContents();
-    },
-
     loading: function() {
       this.updateContents();
     }
   },
-  created() {
-    this.items = store.state[this.gameName][this.sectionName];
+  mounted() {
+    var savedItems = this.getData();
+    if (savedItems !== null) this.items = JSON.parse(savedItems);
   },
 };
 </script>

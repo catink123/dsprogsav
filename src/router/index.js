@@ -12,11 +12,10 @@ const routes = [
     component: Home
   },
   {
-    path: '/:gameName/:sectionName',
+    path: '/:gameName',
     component: Section,
     props: route => {
       return {
-        sectionName: route.params.sectionName,
         gameName: route.params.gameName
       }
     }

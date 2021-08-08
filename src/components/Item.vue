@@ -1,18 +1,13 @@
 <template>
-  <div class="card" :class="done ? 'done' : null" @click="toggleDone">
+  <div class="card" :class="cardDone ? 'done' : null">
     <div class="main">
-      <img class="image" :src="imageURL" />
-      <p class="name" :class="name.length >= 20 ? 'longName' : null">{{ name }}</p>
+      <p class="name" :class="name.length >= 30 ? 'longName' : null">{{ name }}</p>
+      <div class="items scrollable">
+        <p class="item" :class="item.isDone ? 'done' : null" v-for="item in items" :key="item.text" @click="toggleDone(item.text)">{{ item.text }}</p>
+      </div>
     </div>
-    <div class="desc">
-      <div class="scrollable">
-        <p>
-          {{ description }} 
-        </p>
-      </div>
-      <div class="controls" @click.stop="">
-        <button @click="deleteItem">Delete</button>
-      </div>
+    <div class="controls">
+      <button @click="deleteItem">Delete</button>
     </div>
   </div>
 </template>
@@ -22,19 +17,27 @@ export default {
   name: "Item",
   props: {
     name: String,
-    done: Boolean,
-    description: String,
-    imageURL: String,
-    clickCallback: Function,
-    deleteCallback: Function
+    items: Array
+  },
+  computed: {
+    cardDone() {
+      var isCardDone = true;
+      for (const i in this.items) {
+        if (!this.items[i].isDone) isCardDone = false;
+      }
+      return isCardDone;
+    }
   },
   methods: {
-    toggleDone() {
-      this.clickCallback(this.name)
+    deleteItem() {
+      this.$emit("onDelete")
     },
 
-    deleteItem() {
-      this.deleteCallback(this.name);
+    toggleDone(key) {
+      this.$emit("onItemClick", {
+        name: this.name,
+        itemKey: key
+      })
     }
   }
 };
@@ -42,8 +45,8 @@ export default {
 
 <style scoped>
 .card {
-  width: 200px;
-  height: 234px;
+  width: 300px;
+  height: 300px;
   background: rgba(0 0 0 / 0.5);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255 255 255 / 0.25);
@@ -53,12 +56,8 @@ export default {
   transition-duration: 0.1s;
 }
 
-.card.done {
+.done {
   background: rgba(0 100 0 / 0.5);
-}
-
-.card.done p.name {
-  background: rgba(0 100 0 / 0.25);
 }
 
 div.main {
@@ -82,13 +81,6 @@ p.name.longName {
   font-size: 12px;
 }
 
-img.image {
-  object-fit: cover;
-  box-sizing: border-box;
-  height: calc(100% - 34px);
-  border-radius: 9px;
-}
-
 div.desc {
   position: absolute;
   top: 0;
@@ -99,20 +91,21 @@ div.desc {
   width: 100%;
 }
 
-div.desc div.scrollable {
+div.scrollable {
   overflow-y: auto;
   height: 100%;
+  padding-bottom: 35px;
 }
 
-div.desc *::-webkit-scrollbar {
+div.scrollable::-webkit-scrollbar {
   width: 10px;
 }
 
-div.desc *::-webkit-scrollbar-track {
+div.scrollable::-webkit-scrollbar-track {
   background: rgba(0 0 0 / 0.5);
 }
 
-div.desc *::-webkit-scrollbar-thumb {
+div.scrollable::-webkit-scrollbar-thumb {
   background: rgba(255 255 255 / 0.15);
   border-radius: 5px 0 0 5px;
 }
@@ -122,17 +115,7 @@ div.desc p {
   padding-bottom: 50px;
 }
 
-.card:hover div.main {
-  opacity: 0;
-  transform: translateY(-100%);
-}
-
-.card:hover div.desc {
-  opacity: 1;
-  transform: scale(1) translateY(0%);
-}
-
-div.desc div.controls {
+div.controls {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -161,5 +144,22 @@ div.controls button:hover {
 div.controls button:active {
   background: white;
   color: black;
+}
+
+div.items {
+  display: flex;
+  flex-direction: column;
+}
+
+p.item {
+  font-family: sans-serif;
+  border-bottom: 1px solid rgba(255 255 255 / 0.25);
+  margin: 0;
+  padding: 10px;
+  transition-duration: .1s;
+}
+
+p.item:last-child {
+  border-bottom: none;
 }
 </style>
